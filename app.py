@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 import os
 import sqlite3
 import pandas as pd
@@ -7,47 +7,34 @@ from ai_hivemind import ingest_data_from_huggingface_api, preprocess_data, store
 app = Flask(__name__)
 
 def create_table():
-    conn = sqlite3.connect('hivemind.db')
-    cursor = conn.cursor()
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS huggingface_results (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        input_text TEXT NOT NULL,
-        output_text TEXT NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-    """)
-    conn.commit()
-    conn.close()
+    # Your create_table function code here
 
 create_table()
 
+def store_question_and_response(question, response):
+    # Your store_question_and_response function code here
+
+def find_consensus(responses):
+    # Your find_consensus function code here
+
+def model_interaction(input_text):
+    # Your model_interaction function code here
+    # Make sure to call the process_model_a, process_model_b, and process_model_c functions
+    # and the model_response function as needed
+
 @app.route("/", methods=["GET", "POST"])
 def index():
-    if request.method == "POST":
-        # Get user input
-        input_text = request.form["input_text"]
-
-        # Fetch and process data from HuggingFace API
-        model_name = "bert-base-cased"
-        api_key = os.getenv("HUGGINGFACE_API_KEY")
-        data = ingest_data_from_huggingface_api(model_name, api_key, input_text)
-        preprocessed_data = preprocess_data(data)
-
-        # Store data in the database
-        store_data_in_database(preprocessed_data, "huggingface_results")
-
-        return redirect(url_for("results"))
-
-    return render_template("index.html")
+    # Your index function code here
 
 @app.route("/results")
 def results():
-    # Fetch data from the database
-    with sqlite3.connect("ai_hivemind.db") as conn:
-        results_df = pd.read_sql("SELECT * FROM huggingface_results", conn)
+    # Your results function code here
 
-    return render_template("results.html", results=results_df.to_dict(orient="records"))
+@app.route('/interact', methods=['POST'])
+def interact():
+    input_text = request.json.get('input_text')
+    output_text = model_interaction(input_text)
+    return jsonify({'output_text': output_text})
 
 if __name__ == "__main__":
     app.run(debug=True)
