@@ -1,6 +1,12 @@
-{% extends 'base.html' %}
-
-{% block content %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <title>AI HiveMind</title>
+  </head>
+  <body>
     <h1>Welcome to the HiveMind AI</h1>
     <form action="/" method="post" enctype="multipart/form-data">
         <div>
@@ -21,4 +27,5 @@
         </div>
         <button type="submit">Submit</button>
     </form>
-{% endblock %}
+</body>
+</html>

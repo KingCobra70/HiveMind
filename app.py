@@ -2,78 +2,24 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify
 from werkzeug.utils import secure_filename
 import os
 import sqlite3
-import pandas as pd
-from ai_hivemind import ingest_data_from_huggingface_api, preprocess_data, store_data_in_database
 from transformers import pipeline
 import concurrent.futures
-from flask_dance.contrib.google import make_google_blueprint, google
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
-
+from memory import ShortTermMemory, LongTermMemory, connect_to_database, create_table, insert_data_into_table, select_data_from_table, update_data_in_table
 
 app = Flask(__name__)
 
-
-class User(UserMixin):
-    def __init__(self, id):
-        self.id = id
-
-login_manager = LoginManager(app)
-login_manager.login_view = 'google.login'
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User(user_id)
-
-google_blueprint = make_google_blueprint(
-    client_id="YOUR_GOOGLE_CLIENT_ID",
-    client_secret="YOUR_GOOGLE_CLIENT_SECRET",
-    scope=["profile", "email"]
-)
-
-app.register_blueprint(google_blueprint, url_prefix="/login")
-
-@app.route("/results")
-@login_required
-def results():
-
-
-@app.route("/login")
-def login():
-    if not google.authorized:
-        return redirect(url_for("google.login"))
-    resp = google.get("/oauth2/v2/userinfo")
-    assert resp.ok, resp.text
-    email = resp.json()["email"]
-    user = User(email)
-    login_user(user)
-    return redirect(url_for("index"))
-
-@app.route("/logout")
-@login_required
-def logout():
-    logout_user()
-    return redirect(url_for("index"))
-
-def create_table():
-    conn = sqlite3.connect('responses.db')
-    c = conn.cursor()
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS responses (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            question TEXT NOT NULL,
-            response TEXT NOT NULL
-        )
-    ''')
-    conn.commit()
+def create_tables():
+    conn = connect_to_database('responses.db')
+    create_table(conn, 'responses')
+    create_table(conn, 'short_term_memory')
+    create_table(conn, 'long_term_memory')
     conn.close()
 
-create_table()
+create_tables()
 
 def store_question_and_response(question, response):
-    conn = sqlite3.connect('responses.db')
-    c = conn.cursor()
-    c.execute('INSERT INTO responses (question, response) VALUES (?, ?)', (question, response))
-    conn.commit()
+    conn = connect_to_database('responses.db')
+    insert_data_into_table(conn, 'responses', (question, response))
     conn.close()
 
 def process_model(model_name, input_text):
