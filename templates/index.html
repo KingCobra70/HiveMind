@@ -3,16 +3,36 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <title>AI Hivemind App</title>
   </head>
   <body>
-    <h1>AI Hivemind App</h1>
-    <form action="/" method="post">
-      <label for="input_text">Enter text:</label>
-      <textarea name="input_text" id="input_text" rows="4" cols="50"></textarea>
-      <br>
-      <input type="submit" value="Submit">
-    </form>
+    <div class="container">
+      <h1>AI Hivemind App</h1>
+      <form action="/" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="input_text">Enter text:</label>
+          <textarea name="input_text" id="input_text" rows="4" cols="50"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="input_image">Upload image:</label>
+          <input type="file" name="input_image" id="input_image">
+          <p>Accepted file types: .jpg, .png</p>
+        </div>
+        <div class="form-group">
+          <label for="input_audio">Upload audio:</label>
+          <input type="file" name="input_audio" id="input_audio">
+          <p>Accepted file types: .mp3, .wav</p>
+        </div>
+        <div class="form-group">
+          <label for="input_video">Upload video:</label>
+          <input type="file" name="input_video" id="input_video">
+          <p>Accepted file types: .mp4, .avi</p>
+        </div>
+        <div class="form-group">
+          <input type="submit" value="Submit">
+        </div>
+      </form>
+    </div>
   </body>
 </html>
